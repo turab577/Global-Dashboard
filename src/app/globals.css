@@ -24,3 +24,39 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.dark-theme {
+  background-color: black !important;
+  color: white !important;
+}
+.light-theme {
+  background-color: white !important;
+  color: black !important;
+}
+
+/* globals.css */
+
+:root {
+  --bg-color: #ffffff;
+  --text-color: #1a1a1a;
+  --primary-color: #2563eb;
+}
+
+.dark {
+  --bg-color: #121212;
+  --text-color: #f5f5f5;
+  --primary-color: #60a5fa;
+}
+
+.light {
+  --bg-color: #ffffff;
+  --text-color: black !important;
+  --primary-color: #2563eb;
+}
+
+/* Apply globally */
+* {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
