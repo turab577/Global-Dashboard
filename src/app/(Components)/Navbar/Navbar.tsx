@@ -16,7 +16,7 @@ export default function Navbar() {
 
   return (
     <nav
-      className="w-full backdrop-blur-md max-h-[70px] shadow-md border-b px-6 py-3 flex items-center justify-between"
+      className="w-full sticky backdrop-blur-md max-h-[70px] shadow-md border-b px-6 py-3 flex items-center justify-between"
       style={{
         backgroundColor: "var(--bg-color)",
         color: "var(--text-color)",

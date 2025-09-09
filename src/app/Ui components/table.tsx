@@ -7,11 +7,11 @@ export type TableControl = {
   striped?: boolean;
   bordered?: boolean;
   shadow?: boolean;
-  borderStyle?: "solid" | "double" | "dashed";
+  borderStyle?: "solid" | "double" | "dashed" | "dotted";
   borderRadius?: number;
   fontSize?: number;
   textAlign?: "left" | "center" | "right";
-  // Optional custom colors
+  // Custom colors
   headerBgColor?: string;
   headerTextColor?: string;
   rowBgColor?: string;
@@ -19,6 +19,9 @@ export type TableControl = {
   zebraColor?: string;
   hoverBgColor?: string;
   hoverTextColor?: string;
+  borderColor?: string;
+  // Custom nth-child colors
+  nthChildColors?: string[];
 };
 
 interface TableProps<T> {
@@ -27,14 +30,16 @@ interface TableProps<T> {
   control?: TableControl;
 }
 
-
-
-export function Table<T extends Record<string, string>>({
+export function Table<T extends Record<string, any>>({
   title,
   data,
   control = {},
 }: TableProps<T>) {
   const keys = data[0] ? Object.keys(data[0]) : [];
+  
+  // Default light grey nth-child colors if not provided
+  const defaultNthColors = ["#fafafa", "#f5f5f5", "#eeeeee", "#e0e0e0"];
+  const nthColors = control.nthChildColors || defaultNthColors;
 
   return (
     <div style={{ marginBottom: 40 }}>
@@ -47,12 +52,11 @@ export function Table<T extends Record<string, string>>({
           fontSize: control.fontSize || 14,
           textAlign: control.textAlign || "left",
           border: control.bordered
-            ? `2px ${control.borderStyle || "solid"} currentColor`
+            ? `2px ${control.borderStyle || "solid"} ${control.borderColor || "#e0e0e0"}`
             : undefined,
           boxShadow: control.shadow ? "0 4px 6px rgba(0,0,0,0.1)" : undefined,
-          borderRadius: control.borderRadius || 0,
+          borderRadius: control.borderRadius ? `${control.borderRadius}px` : "0",
           overflow: "hidden",
-          color: control.rowTextColor || "inherit",
         }}
       >
         {/* Table Head */}
@@ -62,11 +66,13 @@ export function Table<T extends Record<string, string>>({
               <th
                 key={key}
                 style={{
-                  padding: "10px 15px",
-                  backgroundColor:
-                    control.headerBgColor || "var(--table-header-bg)",
-                  color: control.headerTextColor || "var(--table-header-text)",
-                  borderBottom: control.bordered ? "2px solid currentColor" : undefined,
+                  padding: "12px 16px",
+                  backgroundColor: control.headerBgColor || "#f5f5f5",
+                  color: control.headerTextColor || "#424242",
+                  borderBottom: control.bordered 
+                    ? `2px solid ${control.borderColor || "#e0e0e0"}` 
+                    : undefined,
+                  fontWeight: 600,
                 }}
               >
                 {key.toUpperCase()}
@@ -78,44 +84,53 @@ export function Table<T extends Record<string, string>>({
         {/* Table Body */}
         <tbody>
           {data.map((row, idx) => {
+            // Get the nth color based on index
+            const nthColor = nthColors[idx % nthColors.length];
             const isStriped = control.striped && idx % 2 === 1;
+            
+            // Determine background color
+            let bgColor = control.rowBgColor || "#ffffff";
+            if (control.striped && control.nthChildColors) {
+              bgColor = nthColor;
+            } else if (isStriped) {
+              bgColor = control.zebraColor || "#fafafa";
+            }
 
             return (
               <tr
                 key={idx}
                 className={`theme-row ${isStriped ? "striped" : ""}`}
                 style={{
-                  backgroundColor: control.rowBgColor || "var(--table-row-bg)",
-                  color: control.rowTextColor || "var(--table-row-text)",
+                  backgroundColor: bgColor,
+                  color: control.rowTextColor || "#424242",
                   cursor: control.hover ? "pointer" : "default",
-                  transition: "0.2s",
+                  transition: "all 0.2s ease",
                 }}
                 onMouseEnter={(e) => {
                   if (control.hover) {
-                    (e.currentTarget as HTMLTableRowElement).style.backgroundColor =
-                      control.hoverBgColor || "var(--table-row-hover-bg)";
-                    (e.currentTarget as HTMLTableRowElement).style.color =
-                      control.hoverTextColor || "var(--table-row-hover-text)";
+                    e.currentTarget.style.backgroundColor = 
+                      control.hoverBgColor || "#f5f5f5";
+                    e.currentTarget.style.color = 
+                      control.hoverTextColor || "#424242";
                   }
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLTableRowElement).style.backgroundColor =
-                    isStriped
-                      ? control.zebraColor || "var(--table-row-zebra)"
-                      : control.rowBgColor || "var(--table-row-bg)";
-                  (e.currentTarget as HTMLTableRowElement).style.color =
-                    control.rowTextColor || "var(--table-row-text)";
+                  e.currentTarget.style.backgroundColor = bgColor;
+                  e.currentTarget.style.color = 
+                    control.rowTextColor || "#424242";
                 }}
               >
                 {keys.map((key) => (
                   <td
                     key={key}
                     style={{
-                      padding: "10px 15px",
-                      borderBottom: control.bordered ? "1px solid currentColor" : undefined,
+                      padding: "12px 16px",
+                      borderBottom: control.bordered 
+                        ? `1px solid ${control.borderColor || "#e0e0e0"}` 
+                        : undefined,
                     }}
                   >
-                    {row[key]}
+                    {typeof row[key] === 'object' ? JSON.stringify(row[key]) : row[key]}
                   </td>
                 ))}
               </tr>
@@ -123,30 +138,6 @@ export function Table<T extends Record<string, string>>({
           })}
         </tbody>
       </table>
-
-      {/* Theme variables for dark/light mode */}
-      <style jsx>{`
-        :root {
-          --table-header-bg: #1f2937;
-          --table-header-text: #fff;
-          --table-row-bg: #1f2937;
-          --table-row-text: #fff;
-          --table-row-hover-bg: #2563eb;
-          --table-row-hover-text: #fff;
-          --table-row-zebra: #374151;
-        }
-        @media (prefers-color-scheme: light) {
-          :root {
-            --table-header-bg: #f3f4f6;
-            --table-header-text: #111827;
-            --table-row-bg: #f3f4f6;
-            --table-row-text: #111827;
-            --table-row-hover-bg: #dbeafe;
-            --table-row-hover-text: #111827;
-            --table-row-zebra: #e5e7eb;
-          }
-        }
-      `}</style>
     </div>
   );
 }

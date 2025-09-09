@@ -13,121 +13,90 @@ export default function GraphsPage() {
 
   const isDark = theme === "dark";
 
-  // Theme-aware gradients
-  // Theme-aware gradients - use tuples instead of arrays
-const gradients = {
-  red: isDark ? ["#f8717155", "#f8717100"] as [string, string] : ["#ef444455", "#ef444400"] as [string, string],
-  blue: isDark ? ["#3b82f655", "#3b82f600"] as [string, string] : ["#2563eb55", "#2563eb00"] as [string, string],
-  green: isDark ? ["#10b98155", "#10b98100"] as [string, string] : ["#22c55e55", "#22c55e00"] as [string, string],
-  yellow: isDark ? ["#fbbf2455", "#fbbf2400"] as [string, string] : ["#facc1555", "#facc1500"] as [string, string],
-  purple: isDark ? ["#a78bfa55", "#a78bfa00"] as [string, string] : ["#8b5cf655", "#8b5cf600"] as [string, string],
-};
-
   return (
     <div style={{ padding: 20, minHeight: "100vh"}}>
-      <h1 style={{ textAlign: "center", color: isDark ? "#f9fafb" : "#111827", marginBottom: 40 }}>
-        Advanced Theme-Responsive Charts
+      <h1 style={{ textAlign: "center", marginBottom: 40 }}>
+        Easy-to-Use Customizable Charts
       </h1>
 
-      {/* Line Chart */}
+      {/* Simple line chart with minimal customization */}
       <GlobalGraph
         type="line"
         labels={["Jan", "Feb", "Mar", "Apr", "May"]}
         data={[15, 25, 35, 45, 30]}
         title="Monthly Growth"
-        lineColor={isDark ? "#f87171" : "#2563eb"}
-        gradientColors={gradients.red}
-        // pointGlow={true}
-        pointRadius={6}
-        pointHoverRadius={10}
-        tension={0.5}
+        lineColor="#3b82f6" // Blue line
+        fillColor="#3b82f620" // Light blue fill with transparency
       />
 
-      {/* Bar Chart */}
+      {/* Bar chart with custom colors */}
       <GlobalGraph
+      // Type of the chart
         type="bar"
+        // Labels in horizontal
         labels={["Q1", "Q2", "Q3", "Q4"]}
+        // data in vertican
         data={[50, 80, 65, 95]}
+        // upper title
         title="Quarterly Sales"
-        lineColor={isDark ? "#10b981" : "#3b82f6"}
-        borderRadius={12}
-        gradientColors={gradients.green}
-        showGrid={true}
-        gridStyle="horizontal"
+        // Border of the bars 
+        lineColor="#10b981" 
+        // Color of the bars
+        fillColor="#10b981" 
+        // Color for the title text and the total labels
+        // textColor="#111827" 
+        //label for the x-axis labels
+        // labelColor="#4b5563" 
+        // label for y-axis value
+        // valueColor="#374151"
       />
 
-      {/* Radar Chart */}
+      {/* Chart with gradient */}
       <GlobalGraph
-        type="radar"
+        type="line"
         labels={["Week 1", "Week 2", "Week 3", "Week 4"]}
         data={[12, 25, 18, 30]}
         title="Weekly Activity"
-        lineColor={isDark ? "#fbbf24" : "#ef4444"}
-        gradientColors={gradients.yellow}
-        // pointGlow={true}
-        pointRadius={8}
-        pointHoverRadius={12}
-        tension={0.6}
-        animationDuration={1500}
-        animationEasing="easeInOutQuart"
+        lineColor="#f59e0b" // Orange line
+        gradientColors={["#f59e0b40", "#f59e0b00"]} // Orange gradient
+        pointColor="#f59e0b" // Orange points
       />
 
-      {/* Polar Area */}
+      {/* Dark-themed chart */}
       <GlobalGraph
-        type="polarArea"
-        labels={["Red", "Blue", "Green", "Yellow", "Purple"]}
-        data={[11, 16, 7, 14, 9]}
-        title="Polar Distribution"
-        lineColor={isDark ? "#f87171" : "#3b82f6"}
-        gradientColors={gradients.purple}
+        type="bar"
+        labels={["Product A", "Product B", "Product C"]}
+        data={[35, 50, 25]}
+        title="Product Performance"
+        lineColor="#8b5cf6" // Purple line
+        fillColor="#8b5cf6" // Purple fill
+        // textColor="#f3f4f6" // Light text
+        // labelColor="#d1d5db" // Light gray labels
+        // valueColor="#e5e7eb" // Light values
+        gridColor="#4b5563" // Dark grid
       />
 
-      {/* Pie Chart */}
+      {/* Pie chart with custom colors */}
       <GlobalGraph
         type="pie"
         labels={["Apple", "Samsung", "Xiaomi", "Oppo"]}
         data={[45, 25, 15, 15]}
+        labelColor="#d1d5db"
         title="Market Share"
-        gradientColors={gradients.blue}
+        fillColor="#ef4444" // Red fill
+        // textColor="#111827" // Dark text
       />
 
-      {/* Doughnut Chart */}
+      {/* Chart with custom tooltips */}
       <GlobalGraph
-        type="doughnut"
-        labels={["Chrome", "Firefox", "Edge", "Safari"]}
-        data={[60, 20, 10, 10]}
-        title="Browser Usage"
-        gradientColors={gradients.green}
-      />
-
-      {/* Scatter Chart */}
-      <GlobalGraph
-        type="scatter"
-        labels={["Point 1", "Point 2", "Point 3", "Point 4"]}
-        data={[
-          { x: 5, y: 10 },
-          { x: 10, y: 15 },
-          { x: 15, y: 8 },
-          { x: 20, y: 20 },
-        ]}
-        title="Scatter Plot"
-        lineColor={isDark ? "#fbbf24" : "#ef4444"}
-        pointRadius={7}
-        pointHoverRadius={10}
-      />
-
-      {/* Bubble Chart */}
-      <GlobalGraph
-        type="bubble"
-        labels={["Bubble 1", "Bubble 2", "Bubble 3"]}
-        data={[
-          { x: 10, y: 20, r: 15 },
-          { x: 15, y: 10, r: 10 },
-          { x: 20, y: 25, r: 20 },
-        ]}
-        title="Bubble Chart"
-        lineColor={isDark ? "#a78bfa" : "#8b5cf6"}
-        gradientColors={gradients.purple}
+        type="line"
+        labels={["Day 1", "Day 2", "Day 3", "Day 4", "Day 5"]}
+        // labelColor="#fff"
+        data={[22, 35, 28, 40, 32]}
+        title="Daily Performance"
+        lineColor="#ec4899" // Pink line
+        tooltipBgColor="#1f2937" // Dark tooltip background
+        tooltipTextColor="#f9fafb" // Light tooltip text
       />
     </div>
   );

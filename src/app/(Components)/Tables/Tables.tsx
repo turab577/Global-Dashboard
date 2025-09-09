@@ -1,20 +1,21 @@
 "use client";
 
 import React, { useState } from "react";
-import { Table, TableControl } from "@/app/Ui components/table";
+import { Table } from "@/app/Ui components/table";
 
 interface TeamMember {
   name: string;
   age: number;
   role: string;
+  status: "Active" | "Inactive";
 }
 
-
-
 const initialData: TeamMember[] = [
-  { name: "Alice", age: 25, role: "Developer" },
-  { name: "Bob", age: 30, role: "Designer" },
-  { name: "Charlie", age: 22, role: "Intern" },
+  { name: "Alice Johnson", age: 25, role: "Senior Developer", status: "Active" },
+  { name: "Bob Smith", age: 30, role: "UI/UX Designer", status: "Active" },
+  { name: "Charlie Brown", age: 22, role: "Junior Intern", status: "Active" },
+  { name: "Diana Prince", age: 28, role: "Project Manager", status: "Active" },
+  { name: "Ethan Hunt", age: 35, role: "QA Engineer", status: "Inactive" },
 ];
 
 export default function TablesPage() {
@@ -22,85 +23,122 @@ export default function TablesPage() {
 
   const tableConfigs: { title: string; control: TableControl }[] = [
     {
-      title: "Default Table",
-      control: { bordered: true, borderStyle:"dashed", hover: true },
-    },
-    {
-      title: "No Border Table",
-      control: { bordered: false, hover: true },
-    },
-    {
-      title: "Double Border Table",
-      control: { bordered: true, borderStyle: "double", hover: true },
-    },
-    {
-      title: "Zebra Table",
-      control: { striped: true, bordered: true, hover: true },
-    },
-    {
-      title: "Filled Hover Table",
-      control: { hover: true, hoverBgColor: "#1d4ed8", hoverTextColor: "#000000", striped: false },
-    },
-    {
-      title: "Right-Aligned Table",
-      control: { textAlign: "right", striped: true, bordered: true, hover: true },
-    },
-    {
-      title: "Large Font Table",
-      control: { fontSize: 18, striped: true, bordered: true, hover: true },
-    },
-    {
-      title: "Card Shadow Table",
-      control: { shadow: false, striped: true, bordered: true, hover: true, borderRadius: 12 },
-    },
-    {
-      title: "Nth-Child Contrast Table",
-      control: {
-        striped: true,
-        bordered: true,
-
+      title: "Default Light Grey Table",
+      control: { 
+        bordered: true, 
         hover: true,
-        rowBgColor: "#fff",
-        zebraColor: "#fde68a",
-        hoverBgColor: "#f59e0b",
-        hoverTextColor: "#fff",
+        striped: true
       },
     },
     {
-      title: "Custom Colors Table",
+      title: "Custom Light Grey Contrast",
       control: {
-        headerBgColor: "#f97316",
-        headerTextColor: "#fff",
-        rowBgColor: "#fff7ed",
-        rowTextColor: "#b45309",
-        zebraColor: "#fde68a",
-        hoverBgColor: "#f59e0b",
-        hoverTextColor: "#fff",
         striped: true,
         bordered: true,
-        shadow: false,
-        borderRadius: 10,
+        hover: true,
+        // Custom light grey shades
+        nthChildColors: [
+          "#ffffff",     // White
+          "#f5f5f5",     // Very light grey
+          "#eeeeee",     // Light grey
+          "#e0e0e0",     // Medium light grey
+        ],
+        borderColor: "#bdbdbd",
+        headerBgColor: "#616161",
+        headerTextColor: "#ffffff",
+        rowTextColor: "#424242",
+        hoverBgColor: "#bdbdbd",
+        hoverTextColor: "#212121",
+        borderRadius: 8,
+        shadow: true
       },
     },
+    {
+      title: "Blue-Grey Theme",
+      control: {
+        striped: true,
+        bordered: true,
+        hover: true,
+        // Blue-grey shades
+        nthChildColors: [
+          "#eceff1",     // Blue grey 50
+          "#cfd8dc",     // Blue grey 100
+          "#b0bec5",     // Blue grey 200
+          "#90a4ae",     // Blue grey 300
+        ],
+        borderColor: "#78909c",
+        headerBgColor: "#546e7a",
+        headerTextColor: "#ffffff",
+        rowTextColor: "#37474f",
+        hoverBgColor: "#90a4ae",
+        hoverTextColor: "#000000",
+        borderRadius: 6,
+        shadow: false
+      },
+    },
+    {
+      title: "Minimal Grey Theme",
+      control: {
+        striped: true,
+        bordered: false,
+        hover: true,
+        // Very subtle grey shades
+        nthChildColors: [
+          "#fafafa",     // Grey 50
+          "#f5f5f5",     // Grey 100
+          "#eeeeee",     // Grey 200
+        ],
+        headerBgColor: "#f5f5f5",
+        headerTextColor: "#424242",
+        rowTextColor: "#424242",
+        hoverBgColor: "#e0e0e0",
+        hoverTextColor: "#212121",
+        borderRadius: 4,
+        shadow: false
+      },
+    },
+    {
+      title: "Dark Header with Light Rows",
+      control: {
+        striped: true,
+        bordered: true,
+        hover: true,
+        // Light grey rows with dark header
+        nthChildColors: [
+          "#ffffff",     // White
+          "#fafafa",     // Very light grey
+        ],
+        borderColor: "#e0e0e0",
+        headerBgColor: "#424242",
+        headerTextColor: "#ffffff",
+        rowTextColor: "#424242",
+        hoverBgColor: "#f5f5f5",
+        hoverTextColor: "#212121",
+        borderRadius: 0,
+        shadow: false
+      },
+    }
   ];
 
   return (
     <div style={{ padding: 20 }}>
       <h1 style={{ textAlign: "center", marginBottom: 20 }}>
-        Team Members - Full Modern Table Playground
+        Team Members - Light Grey Table Variations
       </h1>
 
       {tableConfigs.map((config, idx) => (
-  <Table 
-    key={idx} 
-    data={data.map(item => ({
-      ...item,
-      age: item.age.toString() // Convert age to string
-    }))} 
-    title={config.title} 
-    control={config.control} 
-  />
-))}
+        <Table 
+          key={idx} 
+          data={data.map(item => ({
+            name: item.name,
+            age: item.age.toString(),
+            role: item.role,
+            status: item.status
+          }))} 
+          title={config.title} 
+          control={config.control} 
+        />
+      ))}
     </div>
   );
 }
