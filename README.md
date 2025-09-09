@@ -11,3 +11,5 @@ chart.js is used for making charts , import the component and call it and define
 see the graphs.tsx for example
 
 same for the table define the component , use the tables 
+
+Loaders are defined , just define their type , color and size and use it

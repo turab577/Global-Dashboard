@@ -1,5 +1,5 @@
 import React from 'react'
-import Graphs from './Graphs'
+import Graphs from './graphs'
 
 export default function page() {
   return (

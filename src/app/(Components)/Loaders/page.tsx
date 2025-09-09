@@ -1,10 +1,10 @@
 import React from 'react'
-import Tables from './tables'
+import Loaders from './loaders'
 
 export default function page() {
   return (
     <div>
-      <Tables/>
+      <Loaders/>
     </div>
   )
 }

@@ -1,15 +1,22 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import GlobalGraph from "@/app/Ui components/graph";
+import GlobalGraph from "@/app/ui-components/graph";
 import { useTheme } from "next-themes";
+import Loader from "@/app/ui-components/loaders";
 
 export default function GraphsPage() {
   const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  
 
   useEffect(() => setMounted(true), []);
-  if (!mounted) return null;
+  
+  if (!mounted) return (
+    <div className="flex justify-center items-center h-[100vh]">
+      <Loader type="fidget"/>
+</div>  
+  );
 
   const isDark = theme === "dark";
 
@@ -24,7 +31,7 @@ export default function GraphsPage() {
         type="line"
         labels={["Jan", "Feb", "Mar", "Apr", "May"]}
         data={[15, 25, 35, 45, 30]}
-        title="Monthly Growth"
+        title="Line Type Graph"
         lineColor="#3b82f6" // Blue line
         fillColor="#3b82f620" // Light blue fill with transparency
       />
@@ -38,7 +45,7 @@ export default function GraphsPage() {
         // data in vertican
         data={[50, 80, 65, 95]}
         // upper title
-        title="Quarterly Sales"
+        title="Bar Type Graph"
         // Border of the bars 
         lineColor="#10b981" 
         // Color of the bars
@@ -56,18 +63,28 @@ export default function GraphsPage() {
         type="line"
         labels={["Week 1", "Week 2", "Week 3", "Week 4"]}
         data={[12, 25, 18, 30]}
-        title="Weekly Activity"
+        title="Line Type Graph"
+        lineColor="#f59e0b" // Orange line
+        gradientColors={["#f59e0b40", "#f59e0b00"]} // Orange gradient
+        pointColor="#f59e0b" // Orange points
+      />
+      <GlobalGraph
+        type="doughnut"
+        labels={["Week 1", "Week 2", "Week 3", "Week 4"]}
+        data={[12, 25, 18, 30]}
+        title="Doughnut Type Graph"
         lineColor="#f59e0b" // Orange line
         gradientColors={["#f59e0b40", "#f59e0b00"]} // Orange gradient
         pointColor="#f59e0b" // Orange points
       />
 
       {/* Dark-themed chart */}
+      
       <GlobalGraph
-        type="bar"
+        type="radar"
         labels={["Product A", "Product B", "Product C"]}
         data={[35, 50, 25]}
-        title="Product Performance"
+        title="Radar Type Graph"
         lineColor="#8b5cf6" // Purple line
         fillColor="#8b5cf6" // Purple fill
         // textColor="#f3f4f6" // Light text
@@ -82,18 +99,18 @@ export default function GraphsPage() {
         labels={["Apple", "Samsung", "Xiaomi", "Oppo"]}
         data={[45, 25, 15, 15]}
         labelColor="#d1d5db"
-        title="Market Share"
+        title="Pie Type Graph"
         fillColor="#ef4444" // Red fill
         // textColor="#111827" // Dark text
       />
 
       {/* Chart with custom tooltips */}
       <GlobalGraph
-        type="line"
+        type="polarArea"
         labels={["Day 1", "Day 2", "Day 3", "Day 4", "Day 5"]}
         // labelColor="#fff"
         data={[22, 35, 28, 40, 32]}
-        title="Daily Performance"
+        title="Polar Area"
         lineColor="#ec4899" // Pink line
         tooltipBgColor="#1f2937" // Dark tooltip background
         tooltipTextColor="#f9fafb" // Light tooltip text

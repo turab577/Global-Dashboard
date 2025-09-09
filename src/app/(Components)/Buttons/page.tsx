@@ -1,10 +1,10 @@
 import React from 'react'
-import Tables from './tables'
+import Buttons from './buttons'
 
 export default function page() {
   return (
     <div>
-      <Tables/>
+      <Buttons/>
     </div>
   )
 }

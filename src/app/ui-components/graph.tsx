@@ -21,6 +21,7 @@ import {
   Legend,
   ScriptableContext,
   ChartType,
+  // Easing,
 } from "chart.js";
 import { Chart } from "react-chartjs-2";
 import { useTheme } from "next-themes";
@@ -77,13 +78,13 @@ export type GlobalGraphProps = {
 
   // Animation
   animationDuration?: number; // Duration of animations in milliseconds
-  animationEasing?: string; // Easing function for animations
+  // animationEasing?: Easing; // Easing function for animations
 
   // Line tension (for line charts)
   tension?: number; // Curvature of line charts (0 = straight, 1 = very curved)
 
   // Extra dataset options
-  datasetOptions?: Record<string, any>; // Additional Chart.js dataset options
+  datasetOptions?: Record<string, unknown>; // Additional Chart.js dataset options
 };
 
 export default function GlobalGraph({
@@ -108,7 +109,7 @@ export default function GlobalGraph({
   showGrid = true,
   gridStyle = "vertical",
   animationDuration = 1000,
-  animationEasing = "easeOutQuart",
+  // animationEasing = "easeOutQuart",
   tension = 0.4,
   datasetOptions = {},
 }: GlobalGraphProps) {
@@ -195,7 +196,7 @@ export default function GlobalGraph({
       color: defaultGridColor,
     };
 
-    const baseOptions: ChartOptions<any> = {
+    const baseOptions: ChartOptions<ChartType> = {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
@@ -234,7 +235,7 @@ export default function GlobalGraph({
       },
       animation: {
         duration: animationDuration,
-        easing: animationEasing as any,
+        // easing: animationEasing,
       },
     };
 
@@ -289,48 +290,31 @@ export default function GlobalGraph({
     showGrid, 
     gridStyle, 
     animationDuration, 
-    animationEasing, 
+    // animationEasing, 
     type, 
     mounted
   ]);
 
-  if (!mounted) {
-    return (
+  const chartKey = `${theme}-${title}-${type}`;
+
+  return (
+    <>
       <div
         style={{
           padding: 20,
           borderRadius: 12,
           height,
           marginBottom: 30,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: defaultTextColor,
         }}
       >
-        Loading chart...
+        <Chart
+          key={chartKey}
+          type={type}
+          data={chartData as ChartData<typeof type>}
+          options={options as ChartOptions<typeof type>}
+          height={height}
+        />
       </div>
-    );
-  }
-
-  const chartKey = `${theme}-${title}-${type}`;
-
-  return (
-    <div
-      style={{
-        padding: 20,
-        borderRadius: 12,
-        height,
-        marginBottom: 30,
-      }}
-    >
-      <Chart
-        key={chartKey}
-        type={type}
-        data={chartData as ChartData<typeof type>}
-        options={options as ChartOptions<typeof type>}
-        height={height}
-      />
-    </div>
+    </>
   );
 }

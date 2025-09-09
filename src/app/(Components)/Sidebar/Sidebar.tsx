@@ -1,10 +1,8 @@
-
-
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search } from "lucide-react";
+import { Loader, Search } from "lucide-react";
 import {
   LayoutDashboard,
   BarChart2,
@@ -17,14 +15,15 @@ import {
   Menu,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation"; // 👈 for active route
+import { usePathname } from "next/navigation";
 
 const components = [
   { id: 0, label: "Overview", icon: LayoutDashboard, link: "/Overview" },
   { id: 1, label: "Graphs", icon: BarChart2, link: "/Graphs" },
   { id: 2, label: "Tables", icon: Table, link: "/Tables" },
-  { id: 3, label: "Buttons", icon: SquarePlus, link: "/Buttons" },
-  { id: 4, label: "Settings", icon: Settings, link: "/Settings" },
+  { id: 3, label: "Loaders", icon: Loader, link: "/Loaders" },
+  { id: 4, label: "Buttons", icon: SquarePlus, link: "/Buttons" },
+  { id: 5, label: "Settings", icon: Settings, link: "/Settings" },
 ];
 
 export default function SidebarLayout({
@@ -39,11 +38,21 @@ export default function SidebarLayout({
   const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => {
-    const checkScreen = () => setIsDesktop(window.innerWidth >= 640);
+    const checkScreen = () => {
+      const desktop = window.innerWidth >= 640;
+      setIsDesktop(desktop);
+      
+      // On mobile, we don't want the sidebar to be in "collapsed" state
+      // It should either be fully open or fully closed
+      if (!desktop && expanded) {
+        setExpanded(true); // Keep it expanded on mobile when open
+      }
+    };
+    
     checkScreen();
     window.addEventListener("resize", checkScreen);
     return () => window.removeEventListener("resize", checkScreen);
-  }, []);
+  }, [expanded]);
 
   // Close mobile sidebar when clicking outside
   useEffect(() => {
@@ -60,9 +69,19 @@ export default function SidebarLayout({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isMobileOpen]);
 
+  // Handle toggle function differently for mobile vs desktop
+  const handleToggle = () => {
+    if (isDesktop) {
+      setExpanded(!expanded);
+    } else {
+      // On mobile, we don't collapse - we just close the sidebar
+      setIsMobileOpen(false);
+    }
+  };
+
   return (
     <div className="sm:flex">
-      {/* Sidebar (fixed) */}
+      {/* Sidebar (fixed) - Desktop only */}
       <motion.div
         animate={{ width: expanded ? 250 : 80 }}
         transition={{ duration: 0.4, type: "spring", stiffness: 80 }}
@@ -77,6 +96,8 @@ export default function SidebarLayout({
           expanded={expanded}
           setExpanded={setExpanded}
           setIsMobileOpen={setIsMobileOpen}
+          isDesktop={isDesktop}
+          onToggle={handleToggle}
         />
       </motion.div>
 
@@ -98,9 +119,7 @@ export default function SidebarLayout({
             exit={{ x: -300 }}
             transition={{ type: "spring", stiffness: 80 }}
             ref={sidebarRef}
-            className={`fixed top-0 left-0 h-full ${
-              expanded ? "w-64" : "w-20"
-            } z-50 flex flex-col shadow-xl sm:hidden`}
+            className="fixed top-0 left-0 h-full w-64 z-50 flex flex-col shadow-xl sm:hidden"
             style={{
               backgroundColor: "var(--bg-color)",
               color: "var(--text-color)",
@@ -108,9 +127,11 @@ export default function SidebarLayout({
             }}
           >
             <SidebarContent
-              expanded={expanded}
+              expanded={true} // Always expanded on mobile
               setExpanded={setExpanded}
               setIsMobileOpen={setIsMobileOpen}
+              isDesktop={isDesktop}
+              onToggle={handleToggle}
             />
           </motion.div>
         )}
@@ -118,7 +139,9 @@ export default function SidebarLayout({
 
       {/* Main Content wrapper */}
       <motion.main
-        animate={{ marginLeft: isDesktop ? (expanded ? 250 : 80) : 0 }}
+        animate={{ 
+          marginLeft: isDesktop ? (expanded ? 250 : 80) : 0 
+        }}
         transition={{ duration: 0.4, type: "spring", stiffness: 80 }}
         className="flex-1 min-h-screen"
         style={{
@@ -136,12 +159,16 @@ function SidebarContent({
   expanded,
   setExpanded,
   setIsMobileOpen,
+  isDesktop,
+  onToggle,
 }: {
   expanded: boolean;
   setExpanded: (val: boolean) => void;
   setIsMobileOpen: (val: boolean) => void;
+  isDesktop: boolean;
+  onToggle: () => void;
 }) {
-  const pathname = usePathname(); // 👈 current route
+  const pathname = usePathname();
 
   return (
     <>
@@ -162,35 +189,46 @@ function SidebarContent({
             </motion.span>
           )}
         </AnimatePresence>
-        <button
-          onClick={() => setExpanded(!expanded)}
-          className="p-2 rounded-full transition cursor-pointer"
-          style={{ backgroundColor: "var(--button-bg)" }}
-        >
-          {expanded ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
-        </button>
+        {isDesktop ? (
+          <button
+            onClick={onToggle}
+            className="p-2 rounded-full transition cursor-pointer"
+            style={{ backgroundColor: "var(--button-bg)" }}
+          >
+            {expanded ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+          </button>
+        ) : (
+          <button
+            onClick={onToggle}
+            className="p-2 rounded-full transition cursor-pointer"
+            style={{ backgroundColor: "var(--button-bg)" }}
+          >
+            <ChevronLeft size={20} />
+          </button>
+        )}
       </div>
 
       {/* Menu */}
       <nav className="flex-1 flex flex-col gap-2 p-3">
         {components.map((item) => {
-          const isActive = pathname === item.link; // 👈 check if active
+          const isActive = pathname === item.link;
           return (
             <Link
               key={item.id}
               href={item.link}
               onClick={() => setIsMobileOpen(false)}
+              className={`hover:border-1 hover:border-blue-500 hover:rounded-2xl ${isActive ? "border-1 border-blue-500 rounded-2xl" : ""}`}
             >
               <motion.div
                 whileHover={{ scale: 1.05 }}
-                className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition ${
+                className={`flex items-center gap-3 p-3 !bg-transparent rounded-xl cursor-pointer transition ${
                   isActive
                     ? "bg-[var(--primary-bg)] text-[var(--primary-text)]"
                     : "hover:bg-[var(--hover-bg)] hover:text-[var(--hover-text)]"
                 }`}
               >
                 <div style={{ color: "var(--icon-color)" }}>
-                  <item.icon size={20} />
+                  <item.icon size={20} className="!bg-transparent"/>
                 </div>
                 <AnimatePresence>
                   {expanded && (
@@ -198,7 +236,7 @@ function SidebarContent({
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -10 }}
-                      className="font-medium"
+                      className="font-medium !bg-transparent"
                     >
                       {item.label}
                     </motion.span>

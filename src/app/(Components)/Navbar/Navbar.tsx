@@ -61,10 +61,6 @@ export default function Navbar() {
             className={`w-7 h-7 flex items-center justify-center rounded-full shadow-md transform transition-transform duration-300 ${
               theme === "dark" ? "translate-x-7" : "translate-x-0"
             }`}
-            style={{
-              backgroundColor: "",
-              color: "",
-            }}
           >
             {theme === "dark" ? <Moon size={16} /> : <Sun size={16} />}
           </div>
