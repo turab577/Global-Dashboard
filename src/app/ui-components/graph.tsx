@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -21,7 +21,9 @@ import {
   Legend,
   ScriptableContext,
   ChartType,
-  // Easing,
+  Plugin,
+  ChartConfiguration,
+  TooltipItem,
 } from "chart.js";
 import { Chart } from "react-chartjs-2";
 import { useTheme } from "next-themes";
@@ -47,44 +49,67 @@ ChartJS.register(
   Legend
 );
 
+// Custom plugin for vertical line on hover - only for line charts
+const verticalLinePlugin: Plugin = {
+  id: "verticalLinePlugin",
+  afterDraw: (chart) => {
+    // Only apply to line charts
+    // if (chart.config.type !== "line") return;
+    
+    const ctx = chart.ctx;
+    const tooltip = chart.tooltip;
+    
+    if (tooltip && tooltip.getActiveElements && tooltip.getActiveElements().length > 0) {
+      const activeElements = tooltip.getActiveElements();
+      const activePoint = activeElements[0];
+      const x = activePoint.element.x;
+      const topY = chart.scales.y.top;
+      const bottomY = chart.scales.y.bottom;
+      
+      // Get the dataset color for the line
+      const dataset = chart.data.datasets[activePoint.datasetIndex];
+      const lineColor = dataset.borderColor || '#3b82f6';
+
+      ctx.save();
+      ctx.beginPath();
+      
+      // Draw from top to bottom
+      ctx.moveTo(x, topY);
+      ctx.lineTo(x, bottomY);
+      
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = lineColor + "90"; // Add transparency
+      ctx.setLineDash([5, 5]);
+      ctx.stroke();
+      ctx.restore();
+    }
+  },
+};
+
 export type GlobalGraphProps = {
-  // Basic chart configuration
-  type?: ChartType; // Chart type: 'line', 'bar', 'pie', etc.
-  labels: string[]; // X-axis labels or category names
-  data: number[] | { x: number; y: number; r?: number }[]; // Data values
-  title?: string; // Chart title
-  height?: number; // Chart container height
-
-  // Color customization
-  lineColor?: string; // Color of lines/borders in the chart
-  fillColor?: string; // Solid fill color for charts
-  gradientColors?: [string, string]; // Gradient colors for fill areas [start, end]
-  textColor?: string; // Color of title and legend text
-  labelColor?: string; // Color of axis labels (Jan, Feb, etc.)
-  valueColor?: string; // Color of axis values (10, 20, etc.)
-  gridColor?: string; // Color of grid lines
-  pointColor?: string; // Color of data points
-  tooltipBgColor?: string; // Background color of tooltips
-  tooltipTextColor?: string; // Text color of tooltips
-
-  // Points & bars
-  pointRadius?: number; // Size of data points
-  pointHoverRadius?: number; // Size of data points on hover
-  borderRadius?: number; // Border radius for bar charts
-
-  // Grid
-  showGrid?: boolean; // Whether to show grid lines
-  gridStyle?: "l-shape" | "horizontal" | "vertical" | "none"; // Grid line style
-
-  // Animation
-  animationDuration?: number; // Duration of animations in milliseconds
-  // animationEasing?: Easing; // Easing function for animations
-
-  // Line tension (for line charts)
-  tension?: number; // Curvature of line charts (0 = straight, 1 = very curved)
-
-  // Extra dataset options
-  datasetOptions?: Record<string, unknown>; // Additional Chart.js dataset options
+  type?: ChartType;
+  labels: string[];
+  data: number[] | { x: number; y: number; r?: number }[];
+  title?: string;
+  height?: number;
+  lineColor?: string;
+  fillColor?: string;
+  gradientColors?: [string, string];
+  textColor?: string;
+  labelColor?: string;
+  valueColor?: string;
+  gridColor?: string;
+  pointColor?: string;
+  tooltipBgColor?: string;
+  tooltipTextColor?: string;
+  pointRadius?: number;
+  pointHoverRadius?: number;
+  borderRadius?: number;
+  showGrid?: boolean;
+  gridStyle?: "l-shape" | "horizontal" | "vertical" | "none";
+  animationDuration?: number;
+  tension?: number;
+  datasetOptions?: Record<string, unknown>;
 };
 
 export default function GlobalGraph({
@@ -109,19 +134,21 @@ export default function GlobalGraph({
   showGrid = true,
   gridStyle = "vertical",
   animationDuration = 1000,
-  // animationEasing = "easeOutQuart",
   tension = 0.4,
   datasetOptions = {},
 }: GlobalGraphProps) {
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const chartRef = useRef<ChartJS>(null);
   
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   
-  // Calculate theme-aware colors
-  const isDark = theme === "dark";
+  // Use resolvedTheme to avoid flash of unstyled content
+  const isDark = mounted ? (resolvedTheme === "dark") : false;
   
-  // Default theme-aware colors (only if not provided by user)
+  // Default theme-aware colors
   const defaultLineColor = lineColor || (isDark ? "#3b82f6" : "#2563eb");
   const defaultTextColor = textColor || (isDark ? "#f9fafb" : "#111827");
   const defaultLabelColor = labelColor || (isDark ? "#d1d5db" : "#4b5563");
@@ -134,7 +161,7 @@ export default function GlobalGraph({
   const chartData = React.useMemo(() => {
     if (!mounted) return { labels: [], datasets: [] };
     
-    let background: string | ((ctx: ScriptableContext<"line">) => CanvasGradient) = fillColor || "transparent";
+    let background: string | CanvasGradient | ((ctx: ScriptableContext<"line">) => CanvasGradient) = fillColor || "transparent";
 
     if (type === "line" && gradientColors) {
       background = (ctx: ScriptableContext<"line">) => {
@@ -159,7 +186,7 @@ export default function GlobalGraph({
           backgroundColor: background,
           pointBackgroundColor: defaultPointColor,
           borderWidth: 2,
-          tension,
+          tension: type === "line" ? tension : undefined,
           pointRadius,
           pointHoverRadius,
           borderRadius,
@@ -186,7 +213,7 @@ export default function GlobalGraph({
 
   const options = React.useMemo(() => {
     if (!mounted) return {};
-    
+
     const xGrid = {
       display: showGrid && (gridStyle === "l-shape" || gridStyle === "horizontal"),
       color: defaultGridColor,
@@ -212,67 +239,62 @@ export default function GlobalGraph({
           display: !!title,
           text: title,
           color: defaultTextColor,
-          font: {
-            size: 18,
-            weight: 'bold',
-          },
-          padding: {
-            top: 10,
-            bottom: 30,
-          },
+          font: { size: 18, weight: 'bold' },
+          padding: { top: 10, bottom: 30 },
         },
         tooltip: {
           titleColor: defaultTooltipTextColor,
           bodyColor: defaultTooltipTextColor,
           backgroundColor: defaultTooltipBgColor,
-          titleFont: {
-            weight: 'bold',
-          },
+          titleFont: { weight: "bold" },
           padding: 12,
           boxPadding: 6,
           usePointStyle: true,
+          callbacks: {
+            label: function (context: TooltipItem<ChartType>) {
+              return `${context.dataset.label}: ${context.parsed.y}`;
+            },
+          },
         },
       },
-      animation: {
-        duration: animationDuration,
-        // easing: animationEasing,
-      },
+      animation: { duration: animationDuration },
     };
 
-    // Add scales for cartesian charts (line, bar)
+    // Conditional tooltip / hover mode
+    if (type === "line") {
+      baseOptions.interaction = {
+        mode: "index",
+        intersect: false, // tooltip even away from the point
+      };
+    } else {
+      baseOptions.interaction = {
+        mode: "nearest",
+        intersect: true, // tooltip only when exactly on point/bar/slice
+      };
+    }
+
     if (type === "line" || type === "bar") {
       baseOptions.scales = {
         x: {
           grid: xGrid,
-          ticks: {
-            color: defaultLabelColor,
-          },
+          ticks: { color: defaultLabelColor },
         },
         y: {
           grid: yGrid,
-          ticks: {
-            color: defaultValueColor,
-          },
+          ticks: { color: defaultValueColor },
         },
       };
     }
-    
-    // Special options for radar charts
+
     if (type === "radar") {
       baseOptions.scales = {
         r: {
-          grid: {
-            color: defaultGridColor,
-          },
-          angleLines: {
-            color: defaultGridColor,
-          },
-          pointLabels: {
-            color: defaultLabelColor,
-          },
+          grid: { color: defaultGridColor },
+          angleLines: { color: defaultGridColor },
+          pointLabels: { color: defaultLabelColor },
           ticks: {
             color: defaultValueColor,
-            backdropColor: 'transparent',
+            backdropColor: "transparent",
           },
         },
       };
@@ -280,41 +302,57 @@ export default function GlobalGraph({
 
     return baseOptions;
   }, [
-    defaultTextColor, 
-    defaultLabelColor, 
-    defaultValueColor, 
+    defaultTextColor,
+    defaultLabelColor,
+    defaultValueColor,
     defaultGridColor,
     defaultTooltipBgColor,
     defaultTooltipTextColor,
-    title, 
-    showGrid, 
-    gridStyle, 
-    animationDuration, 
-    // animationEasing, 
-    type, 
-    mounted
+    title,
+    showGrid,
+    gridStyle,
+    animationDuration,
+    type,
+    mounted,
   ]);
 
-  const chartKey = `${theme}-${title}-${type}`;
-
-  return (
-    <>
+  if (!mounted) {
+    return (
       <div
         style={{
           padding: 20,
           borderRadius: 12,
           height,
           marginBottom: 30,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: resolvedTheme === "dark" ? "#f9fafb" : "#111827",
         }}
       >
-        <Chart
-          key={chartKey}
-          type={type}
-          data={chartData as ChartData<typeof type>}
-          options={options as ChartOptions<typeof type>}
-          height={height}
-        />
+        <div>Loading chart...</div>
       </div>
-    </>
+    );
+  }
+
+  return (
+    <div
+      style={{
+        padding: 20,
+        borderRadius: 12,
+        height,
+        marginBottom: 30,
+        transition: 'background-color 0.3s ease',
+      }}
+    >
+      <Chart
+        ref={chartRef}
+        type={type}
+        data={chartData as ChartData<typeof type>}
+        options={options as ChartOptions<typeof type>}
+        height={height}
+        plugins={type === "line" ? [verticalLinePlugin] : []}
+      />
+    </div>
   );
 }

@@ -18,7 +18,7 @@ const Button: React.FC<ButtonProps> = ({
   const baseClasses = 'px-4 py-2 rounded font-medium transition-colors border'
   
   const variantClasses = {
-    filled: 'bg-blue-500 border-blue-500 text-white hover:bg-blue-600 !bg-blue-600 !text-white cursor-pointer hover:border-blue-600',
+    filled: 'bg-blue-500 border-blue-500 text-white hover:bg-blue-600 !bg-blue-600 !text-white cursor-pointer hover:!bg-blue-700',
     bordered: 'border-blue-500 cursor-pointer text-blue-500 hover:bg-blue-50',
     primary: 'bg-blue-500 cursor-pointer border-blue-500 text-white hover:bg-blue-600 hover:border-blue-600',
     secondary: 'bg-gray-500 cursor-pointer border-gray-500 text-white hover:bg-gray-600 hover:border-gray-600',

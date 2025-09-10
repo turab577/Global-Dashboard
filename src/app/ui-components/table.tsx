@@ -53,7 +53,7 @@ interface TableProps<T> {
   onRowClick?: (row: T, index: number) => void;
   showModal?: boolean;
   modalTitle?: string;
-  clickable?: boolean; // NEW PROP: Manual control over clickability
+  clickable?: boolean;
 }
 
 // Modal Component
@@ -168,7 +168,7 @@ function Modal({ isOpen, onClose, title, data, rowIndex }: ModalProps) {
 }
 
 // ============================================
-// ENHANCED TABLE COMPONENT WITH WORKING COLORS
+// ENHANCED TABLE COMPONENT WITH HORIZONTAL SCROLLING
 // ============================================
 
 export function Table<T extends Record<string, unknown>>({
@@ -178,7 +178,7 @@ export function Table<T extends Record<string, unknown>>({
   onRowClick,
   showModal = true,
   modalTitle = "Row Details",
-  clickable = true, // DEFAULT: Table is clickable
+  clickable = true,
 }: TableProps<T>) {
   
   const [modalState, setModalState] = useState<{
@@ -271,7 +271,6 @@ export function Table<T extends Record<string, unknown>>({
         {title && (
           <h2 style={{ 
             marginBottom: 10, 
-            // color: "#333",yy
             fontSize: 18,
             fontWeight: 600
           }}>
@@ -325,7 +324,6 @@ export function Table<T extends Record<string, unknown>>({
       {title && (
         <h2 style={{ 
           marginBottom: 10, 
-          // color: "#333",yy
           fontSize: 18,
           fontWeight: 600
         }}>
@@ -333,73 +331,83 @@ export function Table<T extends Record<string, unknown>>({
         </h2>
       )}
       
-      <table
-        id={tableId}
-        style={{
+      {/* Wrapper div for horizontal scrolling */}
+      <div 
+        style={{ 
+          overflowX: "auto",
           width: "100%",
-          borderCollapse: "collapse",
-          fontSize: control.fontSize || 14,
-          textAlign: control.textAlign || "left",
+          borderRadius: control.borderRadius ? `${control.borderRadius}px` : "0",
+          boxShadow: control.shadow ? "0 4px 6px rgba(0,0,0,0.1)" : "none",
           border: control.bordered
             ? `${getBorderWidth()} ${control.borderStyle || "solid"} ${control.borderColor || "#e0e0e0"}`
             : "none",
-          boxShadow: control.shadow ? "0 4px 6px rgba(0,0,0,0.1)" : "none",
-          borderRadius: control.borderRadius ? `${control.borderRadius}px` : "0",
-          overflow: "hidden",
         }}
       >
-        <thead>
-          <tr>
-            {keys.map((key) => (
-              <th
-                key={key}
-                style={{
-                  padding: paddingSize,
-                  backgroundColor: control.headerBgColor || "#f5f5f5",
-                  color: control.headerTextColor || "#424242",
-                  fontWeight: 600,
-                  borderBottom: (control.headerBorder === true || 
-                    (control.bordered && control.headerBorder !== false))
-                    ? `2px solid ${control.borderColor || "#e0e0e0"}` 
-                    : "none",
-                }}
-              >
-                {key.toUpperCase()}
-              </th>
-            ))}
-          </tr>
-        </thead>
-
-        <tbody>
-          {data.map((row, idx) => (
-            <tr
-              key={idx}
-              style={{
-                // Only show pointer cursor if table is clickable
-                cursor: clickable && (control.hover || onRowClick || showModal) ? "pointer" : "default",
-              }}
-              onClick={() => handleRowClick(row, idx)}
-            >
+        <table
+          id={tableId}
+          style={{
+            width: "100%",
+            minWidth: "max-content", // Ensure table doesn't collapse on small screens
+            borderCollapse: "collapse",
+            fontSize: control.fontSize || 14,
+            textAlign: control.textAlign || "left",
+          }}
+        >
+          <thead>
+            <tr>
               {keys.map((key) => (
-                <td
+                <th
                   key={key}
                   style={{
                     padding: paddingSize,
-                    borderBottom: (control.rowBorder === true || 
-                      (control.bordered && control.rowBorder !== false))
-                      ? `1px solid ${control.borderColor || "#e0e0e0"}` 
+                    backgroundColor: control.headerBgColor || "#f5f5f5",
+                    color: control.headerTextColor || "#424242",
+                    fontWeight: 600,
+                    borderBottom: (control.headerBorder === true || 
+                      (control.bordered && control.headerBorder !== false))
+                      ? `2px solid ${control.borderColor || "#e0e0e0"}` 
                       : "none",
+                    whiteSpace: "nowrap", // Prevent header text from wrapping
                   }}
                 >
-                  {typeof row[key] === 'object' && row[key] !== null 
-                    ? JSON.stringify(row[key]) 
-                    : String(row[key] ?? '')}
-                </td>
+                  {key.toUpperCase()}
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody>
+            {data.map((row, idx) => (
+              <tr
+                key={idx}
+                style={{
+                  // Only show pointer cursor if table is clickable
+                  cursor: clickable && (control.hover || onRowClick || showModal) ? "pointer" : "default",
+                }}
+                onClick={() => handleRowClick(row, idx)}
+              >
+                {keys.map((key) => (
+                  <td
+                    key={key}
+                    style={{
+                      padding: paddingSize,
+                      borderBottom: (control.rowBorder === true || 
+                        (control.bordered && control.rowBorder !== false))
+                        ? `1px solid ${control.borderColor || "#e0e0e0"}` 
+                        : "none",
+                      whiteSpace: "nowrap", // Prevent cell content from wrapping
+                    }}
+                  >
+                    {typeof row[key] === 'object' && row[key] !== null 
+                      ? JSON.stringify(row[key]) 
+                      : String(row[key] ?? '')}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {/* Modal - Only show if table is clickable */}
       {clickable && showModal && (

@@ -2,13 +2,15 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Loader, Search } from "lucide-react";
+import { ChartLine, FileAxis3DIcon, KeyRound, Loader, LogIn, Power, Search, ToggleRight } from "lucide-react";
+import { useTheme } from "next-themes";
+import Button from "@/app/ui-components/buttons";
+
+
 import {
-  LayoutDashboard,
-  BarChart2,
+  // LayoutDashboard,
   Table,
-  Settings,
-  SquarePlus,
+  // Settings,
   ChevronLeft,
   ChevronRight,
   LogOut,
@@ -17,13 +19,17 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+// const dark = useTheme() === "dark"
+
 const components = [
-  { id: 0, label: "Overview", icon: LayoutDashboard, link: "/Overview" },
-  { id: 1, label: "Graphs", icon: BarChart2, link: "/Graphs" },
+  { id: 1, label: "Graphs", icon: ChartLine, link: "/Graphs" },
   { id: 2, label: "Tables", icon: Table, link: "/Tables" },
   { id: 3, label: "Loaders", icon: Loader, link: "/Loaders" },
-  { id: 4, label: "Buttons", icon: SquarePlus, link: "/Buttons" },
-  { id: 5, label: "Settings", icon: Settings, link: "/Settings" },
+  { id: 4, label: "Buttons", icon: Power, link: "/Buttons" },
+  { id: 5, label: "Toggles", icon: ToggleRight, link: "/Toggle" },
+  { id: 6, label: "Modals", icon: FileAxis3DIcon, link: "/Modals" },
+  { id: 7, label: "Login", icon: KeyRound, link: "/Login" },
+  { id: 8, label: "Signup", icon: LogIn, link: "/Register" },
 ];
 
 export default function SidebarLayout({
@@ -34,6 +40,7 @@ export default function SidebarLayout({
   const [expanded, setExpanded] = useState(true);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
+
 
   const [isDesktop, setIsDesktop] = useState(false);
 
@@ -83,7 +90,7 @@ export default function SidebarLayout({
     <div className="sm:flex">
       {/* Sidebar (fixed) - Desktop only */}
       <motion.div
-        animate={{ width: expanded ? 250 : 80 }}
+        animate={{ width: expanded ? 250 : 70 }}
         transition={{ duration: 0.4, type: "spring", stiffness: 80 }}
         className="fixed top-0 left-0 h-screen z-40 flex-col shadow-xl hidden sm:flex"
         style={{
@@ -169,6 +176,11 @@ function SidebarContent({
   onToggle: () => void;
 }) {
   const pathname = usePathname();
+
+    const [isModalOpen , setIsModalOpen] = useState(false);
+      const { resolvedTheme } = useTheme();
+
+
 
   return (
     <>
@@ -266,22 +278,70 @@ function SidebarContent({
         </div>
       </nav>
 
+           {isModalOpen && (
+  <AnimatePresence>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[99999] flex items-center justify-center"
+      style={{
+        backgroundColor:
+          resolvedTheme === "dark"
+            ? "rgba(0,0,0,0.6)"
+            : "rgba(0,0,0,0.4)", // always darker for overlay
+      }}
+    >
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        className="w-[400px] rounded-xl shadow-xl p-6 text-center"
+        style={{
+          // backgroundColor: resolvedTheme === "dark" ? "#ffffff" : "#111111",
+          color: resolvedTheme === "dark" ? "#111111" : "#ffffff",
+          border: `1px solid ${resolvedTheme === "dark" ? "#ddd" : "#333"}`,
+        }}
+      >
+        <h2 className="text-xl font-semibold mb-4">Confirm Logout</h2>
+        <p className="mb-6">
+          Are you sure you want to log out of your account?
+        </p>
+
+        <div className="flex justify-center gap-4">
+          <Button variant="primary" onClick={() => setIsModalOpen(false)}>
+            Cancel
+          </Button>
+
+          <Button
+            variant="filled"
+            
+          >
+            Logout
+          </Button>
+        </div>
+      </motion.div>
+    </motion.div>
+  </AnimatePresence>
+)}
+
+
+
+
       {/* Footer */}
       <div
         className="p-4"
         style={{ borderTop: "1px solid var(--border-color)" }}
       >
-        <button
-          className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-xl transition"
-          style={{
-            backgroundColor: "var(--danger-bg)",
-            color: "var(--danger-text)",
-          }}
-          onClick={() => setIsMobileOpen(false)}
+        <Button
+          className="w-full flex cursor-pointer items-center justify-center gap-2 px-4 py-2 rounded-xl transition"
+          variant="bordered"
+          onClick={() => setIsModalOpen(true)}
         >
           <LogOut size={18} />
-          <motion.span className="font-medium">Log out</motion.span>
-        </button>
+          <motion.span className={`font-medium ${ expanded ? "block" : "hidden" }`}>Log out</motion.span>
+        </Button>
       </div>
     </>
   );

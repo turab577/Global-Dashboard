@@ -41,7 +41,7 @@ const Buttons: React.FC = () => {
             <h2 className="text-lg font-semibold mb-3">Different Sizes</h2>
             <div className="flex items-center gap-3 flex-wrap">
               <Button className="px-2 py-1 text-xs border">XS</Button>
-              <Button className="px-3 py-1 text-sm border">Small</Button>
+              <Button className="px-3 py-1 text-sm border">Sm </Button>
               <Button className="border">Medium</Button>
               <Button className="px-5 py-2 text-lg border">Large</Button>
               <Button className="px-6 py-3 text-xl border">XL</Button>

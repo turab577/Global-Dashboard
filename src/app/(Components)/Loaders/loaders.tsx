@@ -41,7 +41,7 @@ const LoaderLibrary = () => {
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold text-center mb-2 text-gray-800">Complete Loader Library</h1>        
         {/* Category Navigation */}
-        <div className="flex flex-wrap justify-center gap-2 mb-8">
+        <div className="flex !overflow-x-auto sm:justify-center gap-2 mb-8">
           {(Object.keys(loaderCategories) as LoaderCategory[]).map(category => (
             <button
               key={category}
