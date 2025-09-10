@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Sidebar from "@/app/(Components)/Sidebar/sidebar";
-import Navbar from "@/app/(Components)/Navbar/navbar";
+import Sidebar from "@/app/(Components)/Sidebar/side";
+import Navbar from "@/app/(Components)/Navbar/nav";
 import { ThemeProvider } from "next-themes";
 // import { Zilla_Slab } from "next/font/google";
 
