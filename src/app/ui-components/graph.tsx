@@ -18,6 +18,8 @@ import {
   RadialLinearScale,
   Title,
   Tooltip,
+   LineController,   // <-- add this
+  BarController,
   Legend,
   ScriptableContext,
   ChartType,
@@ -43,6 +45,8 @@ ChartJS.register(
   DoughnutController,
   BubbleController,
   ScatterController,
+   LineController,   
+  BarController,
   RadialLinearScale,
   Title,
   Tooltip,
