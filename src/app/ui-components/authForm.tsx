@@ -26,7 +26,7 @@ export default function AuthForm({ mode, onSubmit }: AuthFormProps) {
   };
 
   return (
-    <div className="flex !items-center !overflow-hidden justify-center h-[90vh] bg-gray-100 dark:bg-gray-900">
+    <div className="flex !items-center !overflow-hidden justify-center h-[80vh] bg-gray-100 dark:bg-gray-900">
       <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
         <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-white mb-6">
           {mode === "login" ? "Login to Your Account" : "Create a New Account"}

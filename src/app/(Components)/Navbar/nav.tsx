@@ -4,11 +4,14 @@ import { Home, Search, Sun, Moon } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import ToggleSwitch from "@/app/ui-components/toggles";
 
 export default function Navbar() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const path = usePathname();
+    const [icon, setIcon] = useState(true);
+
 
   // Fix hydration mismatch
   useEffect(() => setMounted(true), []);
@@ -48,24 +51,12 @@ export default function Navbar() {
       </div>
 
       {/* Right: Dark/Light Toggle */}
-      <div>
-        <button
-          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-          className="w-16 h-9 flex items-center rounded-full p-1 transition duration-300 shadow-inner"
-          style={{
-            backgroundColor: "#d2d2d2",
-            color: "var(--text-color)",
-          }}
-        >
-          <div
-            className={`w-7 h-7 flex items-center justify-center rounded-full shadow-md transform transition-transform duration-300 ${
-              theme === "dark" ? "translate-x-7" : "translate-x-0"
-            }`}
-          >
-            {theme === "dark" ? <Moon size={16} /> : <Sun size={16} />}
-          </div>
-        </button>
-      </div>
+
+          <ToggleSwitch
+          isOn={theme !== "dark"}
+          onToggle={() => setTheme(theme === "dark" ? "light" : "dark")}
+          withIcons
+        />
     </nav>
   );
 }

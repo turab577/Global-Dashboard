@@ -11,23 +11,23 @@ const LoaderLibrary = () => {
   // Organized by categories with proper typing
   const loaderCategories: Record<LoaderCategory, string[]> = {
     all: [
-      'spinner', 'dots', 'pulse', 'bars', 'ripple', 'progress', 
+      'spinner', 'dots', 'pulse', 'bars', 'ripple', 
       'clock', 'orbit', 'infinity', 'cube', 'wave', 'neon', 
       'fractal', 'meteor', 'atom', 'zigzag', 'staircase', 
       'flip', 'firework', 'honeycomb', 'cyber', 'snowflake',
       'yinyang', 'spiral', 'heartbeat', 'dots-ring', 'jelly',
-      'superballs', 'trinity', 'pong', 'cradle', 'rainbow',
+      'superballs', 'trinity', 'pong',  'rainbow',
       'morph', 'revolver', 'wobble', 'grow', 'circle-dots',
       'square-dots', 'grid', 'fidget', 'gooey', 'blob',
-      'book', 'code', 'database', 'layers', 'cpu',
-      'server', 'cloud', 'wifi', 'bluetooth', 'battery'
+      'book', 'database', 'layers', 'cpu',
+       'cloud', 'wifi', 'bluetooth', 'battery'
     ],
-    classic: ['spinner', 'dots', 'pulse', 'bars', 'ripple', 'progress'],
+    classic: ['spinner', 'dots', 'pulse', 'bars', 'ripple'],
     modern: ['clock', 'orbit', 'infinity', 'cube', 'wave', 'neon', 'fractal'],
     physics: ['meteor', 'atom', 'zigzag', 'staircase', 'flip', 'firework'],
     shapes: ['honeycomb', 'cyber', 'snowflake', 'yinyang', 'spiral', 'heartbeat'],
-    creative: ['dots-ring', 'jelly', 'superballs', 'trinity', 'pong', 'cradle'],
-    tech: ['database', 'cpu', 'server', 'cloud', 'wifi', 'bluetooth', 'battery'],
+    creative: ['dots-ring', 'jelly', 'superballs', 'trinity', 'pong'],
+    tech: ['database', 'cpu', 'cloud', 'wifi', 'bluetooth', 'battery'],
     special: ['rainbow', 'morph', 'revolver', 'wobble', 'grow', 'circle-dots']
   };
 
